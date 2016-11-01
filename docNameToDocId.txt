@@ -1,0 +1,33 @@
+African runner murder(1) 0
+African runner murder(2) 1
+African runner murder(3) 2
+African runner murder(4) 3
+African runner murder(5) 4
+African runner murder(6) 5
+African runner murder(7) 6
+African runner murder(8) 7
+Asiana Airlines Flight 214(1) 8
+Asiana Airlines Flight 214(10) 9
+Asiana Airlines Flight 214(11) 10
+Asiana Airlines Flight 214(2) 11
+Asiana Airlines Flight 214(3) 12
+Asiana Airlines Flight 214(4) 13
+Asiana Airlines Flight 214(5) 14
+Asiana Airlines Flight 214(6) 15
+Asiana Airlines Flight 214(7) 16
+Asiana Airlines Flight 214(8) 17
+Asiana Airlines Flight 214(9) 18
+Aurora shooting(1) 19
+Aurora shooting(10) 20
+Aurora shooting(11) 21
+Aurora shooting(12) 22
+Aurora shooting(13) 23
+Aurora shooting(14) 24
+Aurora shooting(2) 25
+Aurora shooting(3) 26
+Aurora shooting(4) 27
+Aurora shooting(5) 28
+Aurora shooting(6) 29
+Aurora shooting(7) 30
+Aurora shooting(8) 31
+Aurora shooting(9) 32

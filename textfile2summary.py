@@ -1,4 +1,36 @@
+def NewsToTweetsScor(newsVecList,newsWordList,tweetVecList,tweetWordList,scoreFile):
+    print 'start NewsToTweetsScore'
+    cosine_dist=distance.cdist(newsVecList,tweetVecList,'cosine')
+    print cosine_dist
+    euclidean_dist=distance.cdist(newsVecList,tweetVecList,'euclidean')
+    print euclidean_dist
+    dice_dist=distance.cdist(newsVecList,tweetVecList,'dice')
+    print dice_dist
+    manhattan_dist=distance.cdist(newsVecList,tweetVecList,'cityblock')
+    print manhattan_dist
+    correlation_dist=distance.cdist(newsVecList,tweetVecList,'correlation')
+    print correlation_dist
+    jaccard_dist=distance.cdist(newsVecList,tweetVecList,'jaccard')
+    print 'jaccard dist = ',jaccard_dist
 
+    lcs_dist=0
+    print 'lcs dist = ',lcs_dist
+    total_dist=cosine_dist+euclidean_dist+dice_dist+manhattan_dist+correlation_dist+jaccard_dist+lcs_dist
+    total_dist =total_dist*-1.0/6.0
+    print 'total dist = ',total_dist
+    total_dist=total_dist.tolist()
+    strScore=""
+
+    for x in total_dist:
+        strScore+=' '.join(str(v) for v in x)
+        strScore+='\n'
+    
+    scoreFile.write(strScore)
+
+    
+    return total_dist
+
+    
 def textfile2summary(fileName):
 
     print 'textfile2summary start'
@@ -6,6 +38,7 @@ def textfile2summary(fileName):
     docName_file=open('docNameToDocId.txt','r')
     vecFile=open('African runner murder(4)_vec.txt','w')
     docwordFile=open('African runner murder(4)_vec.txt','w')
+    scoreFile=open('score_test.txt','w+')
 
 
 
@@ -70,20 +103,15 @@ def textfile2summary(fileName):
                 table[i][j] = (
                     table[i - 1][j - 1] + 1 if ca == cb else
                     max(table[i][j - 1], table[i - 1][j]))
+        print 'len = ',table[-1][-1]
         return table[-1][-1]
-    def lcs(xstr,ystr):
-        if not xstr or not ystr:
-            return 0
-        x,xs,y,ys=xstr[0],xstr[1:],ystr[0],ystr[1:]
-        if x==y:
-            return len(x+lcs(xs,ys))
-        else:
-            return len(max(lcs(xstr,ys),lcs(xs,ystr),key=len))
+    #------------------------------------------------------------------------
     from scipy.spatial import distance
+    
     cosine_dist=distance.cdist(newsVecList,tweetVecList,'cosine')
     print cosine_dist
-    eu_dist=distance.cdist(newsVecList,tweetVecList,'euclidean')
-    print eu_dist
+    euclidean_dist=distance.cdist(newsVecList,tweetVecList,'euclidean')
+    print euclidean_dist
     dice_dist=distance.cdist(newsVecList,tweetVecList,'dice')
     print dice_dist
     manhattan_dist=distance.cdist(newsVecList,tweetVecList,'cityblock')
@@ -92,9 +120,22 @@ def textfile2summary(fileName):
     print correlation_dist
     jaccard_dist=distance.cdist(newsVecList,tweetVecList,'jaccard')
     print 'jaccard dist = ',jaccard_dist
-    ff=lcs_length('uuuu','iouiui')
-    lcs_dist=distance.cdist([[1,2,3],[4,3,2],[5,1,2]],[[1,7,2],[5,4,2]], lambda u, v: lcs(u,v))
+    #-------------------------------------------------------------------------
+    #ff=lcs_length('uuuu','iouiui')
+    #lcs_dist=distance.cdist(newsVecList,tweetVecList, lambda u, v: lcs_length(u,v))
+    lcs_dist=0
     print 'lcs dist = ',lcs_dist
+    total_dist=cosine_dist+euclidean_dist+dice_dist+manhattan_dist+correlation_dist+jaccard_dist+lcs_dist
+    total_dist =total_dist*-1.0/6.0
+    print 'total dist = ',total_dist
+    total_dist=total_dist.tolist()
+    strScor=""
+
+    for x in total_dist:
+        strScor+=' '.join(str(v) for v in x)
+        strScor+='\n'
+    
+    scoreFile.write(strScor)
     #s2t=set2setScore(newsVecList,newsWordList,tweetVecList,tweetWordList)
     #print s2t
     
@@ -105,6 +146,7 @@ def textfile2summary(fileName):
     vecFile.close()
     sentenceToWordNumMapFile.close()
     sentenceToWordNumMap_file.close()
+    scoreFile.close()
 #--------------------------------------------------
 fileName="African runner murder(4)"
 

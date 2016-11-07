@@ -39,14 +39,7 @@ def all_features(vec1,sent1,vec2,sent2):
                     max(table[i][j - 1], table[i - 1][j]))
         return table[-1][-1]
     #-----------------------------------------------------------------
-    def lcs(xstr,ysstr):
-        if not xstr or noy ystr:
-            return 0
-        x,xs,y,ys=xstr[0],xstr[1:],ystr[0],ystr[1:]
-        if x==y:
-            return len(x+lcs(xs,ys))
-        else:
-            return len(max(lcs(xstr,ys),lcs(xs,ystr),key=len))
+   
         
     #---------------------------------------------------------------------
     sent1=set(sent1)

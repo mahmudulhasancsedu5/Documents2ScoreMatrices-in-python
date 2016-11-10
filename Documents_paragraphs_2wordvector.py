@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 
 
 
@@ -79,7 +80,13 @@ for doc_id in range(len(Processed_DocList)):
     
         if para_id==1:
             print 'Sentences of news'
-            doc_sen=Doc_p[para_id].replace('\n','').split('.' or '?' or '!')
+            #doc_sen=Doc_p[para_id].replace('\n','').split('.')
+            doc_sen=Doc_p[para_id].replace("\\","").split('\n')
+            #doc_sen=[preprocessor.clean(sent) for sent in doc_sen]
+            doc_sen=[preprocessor.clean(sent) for sent in doc_sen]
+            doc_sen=[sent.encode('ascii','ignore') for sent in doc_sen]
+            doc_sen=[re.sub('[~!@#$%^&*()_+\'\",\\-/|1234567890.=`]','',sent) for sent in doc_sen]
+            
             Doc_p[para_id]=[x for x in doc_sen]
             Doc_ini[para_id]=[x for x in doc_sen]
             print 'news len = ',len(Doc_ini[para_id])
@@ -138,17 +145,25 @@ for doc_id in range(len(Processed_DocList)):
         if para_id==2:
             print 'Sentences of tweet',doc_name_list[doc_id]
             #Doc[para_id]='processed sent'
-            doc_twt=Doc_p[para_id].split('\n')
+            doc_twt=Doc_p[para_id].replace("\\","").split('\n')
             Doc_p[para_id]=[x for x in doc_twt]
             Doc_ini[para_id]=[x for x in doc_twt]
             print 'tweet len = ',len(Doc_p[para_id])
 
             for tweet_id in range(len(Doc_p[para_id])):
-                tt=str(doc_id)+' '+str(para_id)+' '+str(tweet_id)+' '+str(Doc_ini[para_id][tweet_id])+'\n'
-                tweetStr+=tt
+                #Doc_p[para_id][tweet_id]=re.sub('[~!@#$%^&*()_+\'\",\\-/|1234567890.=`]','',Doc_p[para_id][tweet_id])
+                #tt=str(doc_id)+' '+str(para_id)+' '+str(tweet_id)+' '+str(Doc_p[para_id][tweet_id])+'\n'
+                #tweetStr+=tt
                 
-                Doc_p[para_id][tweet_id]=preprocessor.clean(Doc_p[para_id][tweet_id])
+                Doc_p[para_id][tweet_id]=preprocessor.clean(Doc_p[para_id][tweet_id]).replace("\\","")
+                Doc_p[para_id][tweet_id]=re.sub('[~!@#$%^&*()_+\'\",\\-/|1234567890.=`]','',Doc_p[para_id][tweet_id])
+
+                tt=str(doc_id)+' '+str(para_id)+' '+str(tweet_id)+' '+str(Doc_p[para_id][tweet_id].encode('ascii','ignore'))+'\n'
+                tweetStr+=tt
+                sentStr+=tt
+                
                 Doc_p[para_id][tweet_id]=Doc_p[para_id][tweet_id].lower()
+                
 
                 Doc_p[para_id][tweet_id] = word_tokenize(Doc_p[para_id][tweet_id])
                 
@@ -174,7 +189,7 @@ for doc_id in range(len(Processed_DocList)):
 
                 #Doc_p[para_id][tweet_id]=[str(porter.stem(i.lower())) for i in word_tokenize(Doc_p[para_id][tweet_id]) if i not in string.punctuation and  i.lower() not in stop_words ]
                 sentToWord_str+=str(doc_id)+' '+str(para_id)+' '+str(tweet_id)+' ';
-                sentStr+=str(doc_id)+' '+str(para_id)+' '+str(tweet_id)+' '+str(Doc_p[para_id][tweet_id])+'\n';
+                #sentStr+=str(doc_id)+' '+str(para_id)+' '+str(tweet_id)+' '+str(Doc_p[para_id][tweet_id])+'\n';
                 
                 sent_word_numing=[]
                 for word in Doc_p[para_id][tweet_id]:

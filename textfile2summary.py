@@ -5,6 +5,8 @@ import sys
 import re
 import numpy
 import pageRank as pr
+import gc
+import math
 def MMR(Sent_ScoreList,SentVecList,summaryLen):
 
     Sent_ScoreListVal=[val for (val,ind) in Sent_ScoreList]
@@ -59,31 +61,156 @@ def create_and_save_Summary(fileName,ScoreList,SentList,summaryLen):
         
     saveToFile.write(Summary)
     saveToFile.close()
+    gc.collect()
+
+def seperation_4scoreMat(total_dist,sentNum,tweetNum):
+    print 'seperate'
+    total_len=len(total_dist)
+    s2sList=[]
+    s2tList=[]
+    t2sList=[]
+    t2tList=[]
+    for i in range(total_len):
+        vec=total_dist[i]
+        if i<sentNum:
+            print 'sent'
+            s2s=vec[:sentNum]
+            s2sList.append(s2s)
+            s2t=vec[sentNum:]
+            s2tList.append(s2t)
+        else:
+            print 'tweet'
+            t2s=vec[:sentNum]
+            t2sList.append(t2s)
+            t2t=vec[sentNum:]
+            t2tList.append(t2t)
+    return s2sList,s2tList,t2tList,t2sList
+            
+        
+
+def NewsToTweetsScor_partitioning(newsVecList,newsWordList,tweetVecList,tweetWordList,scoreFile):
+
+    print 'partition scorring start'
+    elements_per_partition=100.0
+    newsVecList_len=len(newsVecList)
+    tweetVecList_len=len(tweetVecList)
+    print 'tweet end = ',tweetVecList_len,'\n'
+    tweetVecList_parts=tweetVecList_len*1.0/elements_per_partition
+    tweetVecList_parts=math.ceil(tweetVecList_parts)
     
+    total_score=[[] for i in range(newsVecList_len)]
+
+    start=0
+    if tweetVecList_parts>0.0:
+        end=(start+1)*elements_per_partition
+    else:
+        end=tweetVecList_len
+        
+    for i in range(tweetVecList_parts):
+
+        print 'start ',start,' end ',end,'\n'
+        tweetVecList_part=[tweetVecList[ind]for ind in range(start,end)]
+        #---------------------------------------------------------------
+        total_dist=distance.cdist(newsVecList,tweetVecList,'cosine')
+        #print cosine_dist
+        total_dist+=distance.cdist(newsVecList,tweetVecList,'euclidean')
+        #print euclidean_dist
+        total_dist+=distance.cdist(newsVecList,tweetVecList,'dice')
+        #print dice_dist
+        total_dist+=distance.cdist(newsVecList,tweetVecList,'cityblock')
+        #print manhattan_dist
+        correlation_dist=distance.cdist(newsVecList,tweetVecList,'correlation')
+        #print correlation_dist
+        total_dist+=distance.cdist(newsVecList,tweetVecList,'jaccard')
+        #print 'jaccard dist = ',jaccard_dist
+        total_dist=total_dist.tolist()
+        
+        total_score=[total_score[ind]+total_dist[ind] for ind in range(newsVecList_len)]
+        #---------------------------------------------------------------
+        
+        start=end+1
+        if i==tweetVecList_parts-2:
+            end=tweetVecList_len;
+        else:
+            end=end+elements_per_partition
+    
+
+    print 'partition scoring end'
+    
+    
+def NewsToTweetsScor_pdist(newsVecList,newsWordList,tweetVecList,tweetWordList,scoreFile):
+    print 'stat pdist'
+    VecList=newsVecList+tweetVecList
+    #VecList=[bitarray(x) for vec in VecList1]
+    total_dist=distance.pdist(VecList,'cosine')
+    #print cosine_dist
+    total_dist+=distance.pdist(VecList,'euclidean')
+    #print euclidean_dist
+    total_dist+=distance.pdist(VecList,'dice')
+    #print dice_dist
+    total_dist+=distance.pdist(VecList,'cityblock')
+    #print manhattan_dist
+    correlation_dist=distance.pdist(VecList,'correlation')
+    #print correlation_dist
+    total_dist+=distance.pdist(VecList,'jaccard')
+    #print 'jaccard dist = ',jaccard_dist
+    print gc.collect()
+    return total_dist.tolist()
+    
+    
+def NewsToTweetsScor_pair(newsVecList,newsWordList,tweetVecList,tweetWordList,scoreFile):
+    print 'Score pair wise start'
+    newsVecList_len=len(newsVecList)
+    tweetVecList_len=len(tweetVecList)
+    total_dist=[]
+    for i in range(newsVecList_len):
+        u=newsVecList[i]
+        print i,' = ',
+        u_to_v=[]
+        for j in range(tweetVecList_len):
+            
+            v=tweetVecList[j]
+            val=distance.cosine(u,v)
+            val+=distance.euclidean(u,v)
+            val+=distance.dice(u,v)
+            val+=distance.correlation(u,v)
+            val+=distance.jaccard(u,v)
+            val+=distance.cityblock(u,v)
+            val=val/6.0
+            u_to_v.append(val)
+        total_dist.append(u_to_v)
+        
+    print 'pair wise end'
+    return total_dist
+            
+            
+    
+    
+     
     
 def NewsToTweetsScor(newsVecList,newsWordList,tweetVecList,tweetWordList,scoreFile):
     
     print 'start NewsToTweetsScore'
     
-    cosine_dist=distance.cdist(newsVecList,tweetVecList,'cosine')
+    total_dist=distance.cdist(newsVecList,tweetVecList,'cosine')
     #print cosine_dist
-    euclidean_dist=distance.cdist(newsVecList,tweetVecList,'euclidean')
+    total_dist+=distance.cdist(newsVecList,tweetVecList,'euclidean')
     #print euclidean_dist
-    dice_dist=distance.cdist(newsVecList,tweetVecList,'dice')
+    total_dist+=distance.cdist(newsVecList,tweetVecList,'dice')
     #print dice_dist
-    manhattan_dist=distance.cdist(newsVecList,tweetVecList,'cityblock')
+    total_dist+=distance.cdist(newsVecList,tweetVecList,'cityblock')
     #print manhattan_dist
     correlation_dist=distance.cdist(newsVecList,tweetVecList,'correlation')
     #print correlation_dist
-    jaccard_dist=distance.cdist(newsVecList,tweetVecList,'jaccard')
+    total_dist+=distance.cdist(newsVecList,tweetVecList,'jaccard')
     #print 'jaccard dist = ',jaccard_dist
 
     lcs_dist=0
     #print 'lcs dist = ',lcs_dist
-    total_dist=cosine_dist+euclidean_dist+dice_dist+manhattan_dist+correlation_dist+jaccard_dist+lcs_dist
+    #total_dist=cosine_dist+euclidean_dist+dice_dist+manhattan_dist+correlation_dist+jaccard_dist+lcs_dist
     total_dist =total_dist/6.0
     #print 'total dist = ',total_dist
-    total_dist=total_dist.tolist()
+    total_dist_list=total_dist.tolist()
     strScore=""
     print 'calculation finished'
 
@@ -92,11 +219,12 @@ def NewsToTweetsScor(newsVecList,newsWordList,tweetVecList,tweetWordList,scoreFi
         strScore+='\n'
 
     print 'End'
+
     scoreFile.write(strScore)
     scoreFile.close()
 
     #----total dist is a sipy array---
-    return list(total_dist)
+    return total_dist_list
 
     
 def textfile2summary(fileName):
@@ -187,7 +315,7 @@ def textfile2summary(fileName):
     print 'vocaSize = ',vocaSize
     from document2scoreMatrices import doc2vec,seperateSentTweetVec
     vecList,vecStr,wordList=doc2vec(DocSentWordMap,vocaSize)#---no zero word lines---
-
+    gc.collect()
     #-----------------------seperate sentence from tweets-------------
     
     #vecList=[[3 ,1, 0, 0, 0, 1],[3, 1, 1, 1, 0, 1],[3, 2, 0, 1, 1, 0],[3, 2, 0, 1, 1, 1]]
@@ -256,31 +384,37 @@ def textfile2summary(fileName):
     newsWordList=[x[3:] for x in newsWordList]
     tweetVecList=[x[3:] for x in tweetVecList]
     tweetWordList=[x[3:] for x in tweetWordList]
+    #-----------------------------------------------------scor find out-----
 
     ScoreMatList=[]
     ScoreMatTypeList=[]
     
     a2b='sent2tweet'
     scoreFile=open(folderPath+fileName+'_'+a2b+'_score_test.txt','w+')
-    ScoreSent2Tweet=NewsToTweetsScor(newsVecList,newsWordList,tweetVecList,tweetWordList,scoreFile)
+    ScoreSent2Tweet=NewsToTweetsScor_pair(newsVecList,newsWordList,tweetVecList,tweetWordList,scoreFile)
+    gc.collect()
+    
     ScoreMatList.append(ScoreSent2Tweet)
     ScoreMatTypeList.append(('s','t'))
     
     a2b='sent2sent'
     scoreFile=open(folderPath+fileName+'_'+a2b+'_score_test.txt','w+')
-    ScoreSent2Sent=NewsToTweetsScor(newsVecList,newsWordList,newsVecList,newsWordList,scoreFile)
+    ScoreSent2Sent=NewsToTweetsScor_pair(newsVecList,newsWordList,newsVecList,newsWordList,scoreFile)
+    gc.collect()
     ScoreMatList.append(ScoreSent2Sent)
     ScoreMatTypeList.append(('s','s'))
     
     a2b='tweet2sent'
     scoreFile=open(folderPath+fileName+'_'+a2b+'_score_test.txt','w+')
-    ScoreTweet2Sent=NewsToTweetsScor(tweetVecList,tweetWordList,newsVecList,newsWordList,scoreFile)
+    ScoreTweet2Sent=NewsToTweetsScor_pair(tweetVecList,tweetWordList,newsVecList,newsWordList,scoreFile)
+    gc.collect()
     ScoreMatList.append(ScoreTweet2Sent)
     ScoreMatTypeList.append(('t','s'))
     
     a2b='tweet2tweet'
     scoreFile=open(folderPath+fileName+'_'+a2b+'_score_test.txt','w+')
-    ScoreTweet2Tweet=NewsToTweetsScor(tweetVecList,tweetWordList,tweetVecList,tweetWordList,scoreFile)
+    ScoreTweet2Tweet=NewsToTweetsScor_pair(tweetVecList,tweetWordList,tweetVecList,tweetWordList,scoreFile)
+    gc.collect()
     ScoreMatList.append(ScoreTweet2Tweet)
     ScoreMatTypeList.append(('t','t'))
 
@@ -291,21 +425,23 @@ def textfile2summary(fileName):
     node_score=pr.TexRank(ScoreMatList,ScoreMatTypeList)
     TexRanksentScore,TexRanktweetScore=pr.diff_sent_tweet_score(node_score)
     print 'TexRank end'
+    gc.collect()
     
     #TRNewsSummaryFile=open(folderPath+fileName+'_TexRank_sent_.txt','w')
     #TRTweetSummaryFile=open(folderPath+fileName+'_TexRank_tweet_.txt','w')
-    TRNewsSummaryFileName=folderPath+fileName+'_TexRank_sent.txt'
-    TRTweetSummaryFileName=folderPath+fileName+'_TexRank_tweet.txt'
+    TRNewsSummaryFileName=folderPath+fileName+'_TexRank_sent_summary.txt'
+    TRTweetSummaryFileName=folderPath+fileName+'_TexRank_tweet_summary.txt'
     summaryLen=4
     
     create_and_save_Summary(TRNewsSummaryFileName,TexRanksentScore,NewsSentList,summaryLen)
     create_and_save_Summary(TRTweetSummaryFileName,TexRanktweetScore,TweetList,summaryLen)
-
+    gc.collect()
     
     #------------------TexRank end-------------------
     
     print 'scoring end'
-    #-----------------------------------sorte sum--------------------------------------
+    #-----------------------------------SORTESUM start--------------------------------------
+    
     TotalSentNumber=len(ScoreSent2Sent)
     TotalTweetNumber=len(ScoreTweet2Tweet)
 
@@ -332,8 +468,8 @@ def textfile2summary(fileName):
 
 
 
-    NewsSummaryFile=open(folderPath+fileName+'_sent_.txt','w')
-    TweetSummaryFile=open(folderPath+fileName+'_tweet_.txt','w')
+    NewsSummaryFile=open(folderPath+fileName+'_sent_summary.txt','w')
+    TweetSummaryFile=open(folderPath+fileName+'_tweet_summary.txt','w')
     summaryLen=4
     TweetSummary=""
     SentSummary=""
@@ -343,9 +479,9 @@ def textfile2summary(fileName):
         
     NewsSummaryFile.write(SentSummary)
     #-------------------
-    '''
-        calculate mmr
-    '''
+    
+        #calculate mmr
+    
     
 
     #---------------------
@@ -367,11 +503,13 @@ def textfile2summary(fileName):
     sentenceToWordNumMap_file.close()
     #scoreFile.close()
     #--------------------------------------------------
+    
+    
 '''
 #------------main execution start from here--------------
 '''
-DocumentName="African runner murder(4)"
-summarySize=4
+DocumentName="African runner murder(1)"
+
 
 textfile2summary(DocumentName)
         

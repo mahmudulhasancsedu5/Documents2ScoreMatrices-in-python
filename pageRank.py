@@ -34,6 +34,8 @@ def createGraphMultipleMatInput(graphMatArr,detectMatType):
         print clmLen
         MatType=detectMatType[0]
         del detectMatType[0]
+
+        
         
         for i in range(rowLen):
             for j in range(clmLen):
@@ -70,8 +72,8 @@ def diff_sent_tweet_score(gr_node_score):
     SentScoreSorted.reverse()
     TweetScoreSorted=sorted(tweetScore)
     TweetScoreSorted.reverse()
-    print 'Sent pagerank score',SentScoreSorted[:5]
-    print 'Tweet page rank score = ',TweetScoreSorted[:5]
+    print 'Sent pagerank score',SentScoreSorted[:10]
+    print 'Tweet page rank score = ',TweetScoreSorted[:10]
     return SentScoreSorted,TweetScoreSorted
     
 #---------------------------------------------------------------------

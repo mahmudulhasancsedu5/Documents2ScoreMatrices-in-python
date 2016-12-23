@@ -1,8 +1,11 @@
+import gc
+from bitarray import bitarray
 
 def sent2vec(sentWordList,vecSize):
-    vec=[0 for x in range(vecSize)]
+    #vec=[0 for x in range(vecSize)]
+    vec=[False]*vecSize
     for word in sentWordList:
-        vec[int(word)]=1
+        vec[int(word)]=True
     return vec
 
 def doc2vec(DocSentWordMap,vocaSize):
@@ -11,19 +14,21 @@ def doc2vec(DocSentWordMap,vocaSize):
     wordList=[]
     
     for sentword in DocSentWordMap:
-        print sentword[:3]
+        print sentword[2:3]
         vec=[int(x) for x in sentword[:3]]
         vec+=sent2vec(sentword[3:],vocaSize)
+        #gc.collect()
         vecList.append(vec)
         
         words=sentword[:]
         wordList.append(words)
         
-        
+        '''
         vec=[str(x) for x in vec]
         vecStr+=' '.join(vec)
+        '''
         
-        
+     
     return vecList,vecStr,wordList
 
 def seperateSentTweetVec(vecList,wordList):
@@ -35,6 +40,7 @@ def seperateSentTweetVec(vecList,wordList):
 
     tweetvecList=[vecList[i] for i in range(vecList_len) if vecList[i][1]==2]
     tweetwordList=[wordList[i] for i in range(vecList_len) if wordList[i][1]=='2']
+    
     return newsvecList,newswordList,tweetvecList,tweetwordList
 
 
@@ -53,7 +59,7 @@ def oneSentToManyTweet_score(sent_i_vec,sent_i_words,tweetVecSet,tweetWordSet):
         result = all_features(sent_i_vec,sent_i_words,tweet_vec,tweet_words)
         sent_to_all_tweet_score.append(result)
         print 'res = ',result
-        
+    #gc.collect()   
     return sent_to_all_tweet_score
 
 def set2setScore(newsVecList,newsWordList,tweetVecList,tweetWordList):
@@ -66,7 +72,7 @@ def set2setScore(newsVecList,newsWordList,tweetVecList,tweetWordList):
         print 'sent = ',ind
         sent_to_tweetSet_score_arr = oneSentToManyTweet_score(newsVecList[ind],newsWordList[ind],tweetVecList,tweetWordList)
         sentSet_tweetSet_2d_score.append(sent_to_tweetSet_score_arr)
-    
+    #gc.collect()
     return sentSet_tweetSet_2d_score
     
     
@@ -90,6 +96,7 @@ def allSet2allSet_score(newsVecList,newsWordList,tweetVecList,tweetWordList):
 
     tweetSet2sentSet_score_2d_List=set2setScore(tweetVecList,tweetWordList,newsVecList,newsWordList)
 
+    #gc.collect()
     return sentSet2sentSet_score_2d_List,sentSet2tweetSet_score_2d_List,tweetSet2tweetSet_score_2d_List,tweetSet2sentSet_score_2d_List
     
         

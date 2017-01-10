@@ -79,6 +79,63 @@ def ScoreSentByBigram(DocSentBigramList,DocSentBigramMaxCount):
 
     print 'SentScoreByBigram end'
 
+
+def create_and_save_bigram_summary(FileName,DestDirectory,SentScore,TweetScore):
+
+    directory=DestDirectory+FileName+"_bigram_summary_\\"
+    mypath=""
+    docFile=open(FileName,'r')
+    text=docFile.read().split('\n\n')
+    docFile.close()
+    del text[3]
+    HighLight=text[0]
+    News=text[1]
+    NewsSentList=News.split('\n')
+    print 'news sent num = ',len(NewsSentList)
+    cc=0
+    for line in NewsSentList:
+
+        print cc,'   ',line
+        cc+=1
+    
+    Tweets=re.sub('[~!@#$%^&*()_+\'\",\\-/|1234567890.=`]','',text[2])
+    TweetList=Tweets.split('\n')
+    print 'tweets sent num = ',len(TweetList)
+
+    NewsSummaryFile=open(directory+FileName+'_SentBigramSummary.txt','w')
+    TweetSummaryFile=open(directory+FileName+'_TweetBigramSummary.txt','w')
+    summaryLen=4
+    TweetSummary=""
+    SentSummary=""
+    for ind in range(4):
+        
+        SentSummary+=str(NewsSentList[SentScore[ind][1]])+'.\n'
+        
+    NewsSummaryFile.write(SentSummary)
+
+
+    for ind in range(4):
+        TweetSummary+=str(TweetList[TweetScore[ind][1]])+'.\n'
+        
+    TweetSummaryFile.write(TweetSummary)
+    NewsSummaryFile.close()
+    TweetSummaryFile.close()
+
+    
+    
+    
+    
+    
+    
+    #----------------------------
+    if not os.path.exists(directory):
+        print 'Not exist'
+        os.makedirs(directory)
+    else:
+        print 'exist'
+
+        
+    
     
 def create_bigram(FileName):
     print 'create bigram start'
@@ -119,9 +176,13 @@ def create_bigram(FileName):
 
 #----------------------main start---------------------
 
-
+DestDirectory="F:\\Education\\4_2\\Thsis\\python_sentence_vector_creation\\bigram Directory\\"
 FileName="African runner murder(1)"
 create_bigram(FileName)
+
+
+def deSummart():
+    print ""
 
 
 #--------------------main end

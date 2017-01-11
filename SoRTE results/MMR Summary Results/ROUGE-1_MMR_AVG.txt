@@ -1,0 +1,9 @@
+Summary Type                                             Avg_Precision          Avg_Recall         Avg_F-Score
+SORTESENTSUMMARY.TXT                              
+SORTETWEETSUMMARY.TXT                             
+SORTESINGLEWINGSENTSUMMARY.TXT                    
+SORTESINGLEWINGTWEETSUMMARY.TXT                   
+PRSENTSUMMARY.TXT                                 
+PRTWEETSUMMARY.TXT                                
+MMRSORTETWEETSUMMARY.TXT                                      0.160687            0.215410            0.180801
+MMRPRTWEETSUMMARY.TXT                                         0.161937            0.232468            0.187143

@@ -12,6 +12,15 @@ dicInt2Str2={}
 'SORTESINGLEWINGTWEETSUMMARY.TXT'
 'PRSENTSUMMARY.TXT'
 'PRTWEETSUMMARY.TXT'
+'MMRPRTWEETSUMMARY.TXT'
+'MMRSORTETWEETSUMMARY.TXT'
+
+'SENTLEADNEWSSUMMARY.TXT'
+'RANDOMTWEETSUMMARY.TXT'
+'RANDOMNEWSSUMMARY.TXT'
+'TWEETLEADNEWSSUMMARY.TXT'
+
+
 'Avg_Recall'
 'Avg_Precision'
 'Avg_F-Score'
@@ -32,6 +41,14 @@ dicT['SORTESINGLEWINGTWEETSUMMARY.TXT']=3
 dicT['PRSENTSUMMARY.TXT']=4
 dicT['PRTWEETSUMMARY.TXT']=5
 
+dicT['MMRSORTETWEETSUMMARY.TXT']=6
+dicT['MMRPRTWEETSUMMARY.TXT']=7
+
+dicT['SENTLEADNEWSSUMMARY.TXT']=8
+dicT['RANDOMTWEETSUMMARY.TXT']=9
+dicT['RANDOMNEWSSUMMARY.TXT']=10
+dicT['TWEETLEADNEWSSUMMARY.TXT']=11
+
 dicInt2Str1[0]='SORTESENTSUMMARY.TXT'
 dicInt2Str1[1]='SORTETWEETSUMMARY.TXT'
 dicInt2Str1[2]='SORTESINGLEWINGSENTSUMMARY.TXT'
@@ -39,7 +56,26 @@ dicInt2Str1[3]='SORTESINGLEWINGTWEETSUMMARY.TXT'
 dicInt2Str1[4]='PRSENTSUMMARY.TXT'
 dicInt2Str1[5]='PRTWEETSUMMARY.TXT'
 
-TotalResult=[[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]],[[],[],[]]]
+dicInt2Str1[6]='MMRSORTETWEETSUMMARY.TXT'
+dicInt2Str1[7]='MMRPRTWEETSUMMARY.TXT'
+
+dicInt2Str1[8]='SENTLEADNEWSSUMMARY.TXT'
+dicInt2Str1[9]='RANDOMTWEETSUMMARY.TXT'
+dicInt2Str1[10]='RANDOMNEWSSUMMARY.TXT'
+dicInt2Str1[11]='TWEETLEADNEWSSUMMARY.TXT'
+
+TotalResult=[[[],[],[]]
+             ,[[],[],[]]
+             ,[[],[],[]]
+             ,[[],[],[]]
+             ,[[],[],[]]
+             ,[[],[],[]]
+             ,[[],[],[]]
+             ,[[],[],[]]
+             ,[[],[],[]]
+             ,[[],[],[]]
+             ,[[],[],[]]
+             ,[[],[],[]]]
 
 
 def csvFormat(Directory,FileName):
@@ -80,14 +116,37 @@ def csvFormat(Directory,FileName):
         
 
 
-Directory="F:\\Education\\4_2\\Thsis\\python_sentence_vector_creation\\Summary_results\\"
+#Directory="F:\\Education\\4_2\\Thsis\\python_sentence_vector_creation\\SoRTE results\\SoRTE_ROUGE-1\\"
+#Directory="F:\\Education\\4_2\\Thsis\\python_sentence_vector_creation\\SoRTE results\\MMR Summary Results\\"
+Directory="F:\\Education\\4_2\\Thsis\\python_sentence_vector_creation\\Sentence Lead\\"
+from os import listdir
 
+def find_csv_filenames( path_to_dir, suffix=".csv" ):
+    filenames = listdir(path_to_dir)
+    return [ filename for filename in filenames if filename.endswith( suffix ) ]
 
-for i in range(2,14):
-    FileName="Aurora shooting("+str(i)+")_results.csv"
+files=find_csv_filenames( Directory, suffix=".csv" )
+print files
+for FileName in files:
+    print FileName
+    #FileName="Aurora shooting("+str(i)+")_results.csv"
     print FileName
     csvFormat(Directory,FileName)
-    
+
+
+
+
+
+S="Summary Type"
+p='Avg_Precision'
+r='Avg_Recall'
+f='Avg_F-Score'
+res_res=""
+res_res+="%-50s"%(S)
+res_res+="%20s"%(p)
+res_res+="%20s"%(r)
+res_res+="%20s"%(f)
+res_res=str(res_res)+"\n"
 i=0
 for s3 in TotalResult:
 
@@ -97,13 +156,21 @@ for s3 in TotalResult:
     res_line+="%-50s"%(dicInt2Str1[i])
     j=0
     for s in s3:
-        
+
         #res_line+=" "+dicInt2Str2[j]+"      "+str(sum(s)/len(s))+"  "
         #res_line+="      "+str(sum(s)/len(s))+"  "
-        res_line+="%-20f"%(sum(s)/len(s))
+        if len(s)!=0:
+            res_line+="%20f"%(sum(s)/len(s))
         
         j=j+1
     
-    print res_line,"\n"
-    print "\n"
+    #print res_line,"\n"
+
+    res_res+=str(res_line)+"\n"
+    
     i=i+1
+print res_res
+
+resFile=open(Directory+"ROUGE-1_RESULT_AVG.txt","w")
+resFile.write(res_res)
+resFile.close()

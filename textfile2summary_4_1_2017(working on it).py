@@ -794,10 +794,10 @@ def textfile2summary(fileName):
 
 #---------------------------
 
-i=11
+i=8
 while i>0:
 
-    DocumentName="Asiana Airlines Flight 214("+str(i)+")"
+    DocumentName="African runner murder("+str(i)+")"
     print "------------------",DocumentName,"-----------------------------------------\n"
     textfile2summary(DocumentName)
     i=i-1

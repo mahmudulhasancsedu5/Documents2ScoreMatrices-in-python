@@ -1,4 +1,12 @@
-
+from scipy.spatial import distance
+import time
+import os
+import sys
+import re
+import numpy
+import pageRank as pr
+import gc
+import math
 
 def GetDocIdByDocName(DocName):
     print 'GetDocIdByDocName start DocName = ',DocName
@@ -50,6 +58,9 @@ def DocSentWordListToBigramList(DocSentWordList):
 
     return DocSentBigramList,DocSentBigramMaxCount
 
+
+
+
 def ScoreSentByBigram(DocSentBigramList,DocSentBigramMaxCount):
     print 'SentScoreByBigram start'
 
@@ -83,27 +94,72 @@ def ScoreSentByBigram(DocSentBigramList,DocSentBigramMaxCount):
 def create_and_save_bigram_summary(FileName,DestDirectory,SentScore,TweetScore):
 
     directory=DestDirectory+FileName+"_bigram_summary_\\"
-    mypath=""
+    #----------------------------
+    if not os.path.exists(directory):
+        print 'Not exist'
+        os.makedirs(directory)
+    else:
+        print 'exist'
+
+        
+        
     docFile=open(FileName,'r')
     text=docFile.read().split('\n\n')
     docFile.close()
+    
     del text[3]
     HighLight=text[0]
     News=text[1]
     NewsSentList=News.split('\n')
     print 'news sent num = ',len(NewsSentList)
-    cc=0
-    for line in NewsSentList:
-
-        print cc,'   ',line
-        cc+=1
     
     Tweets=re.sub('[~!@#$%^&*()_+\'\",\\-/|1234567890.=`]','',text[2])
     TweetList=Tweets.split('\n')
     print 'tweets sent num = ',len(TweetList)
 
-    NewsSummaryFile=open(directory+FileName+'_SentBigramSummary.txt','w')
-    TweetSummaryFile=open(directory+FileName+'_TweetBigramSummary.txt','w')
+    
+
+    SummaryDir=DestDirectory+FileName+"_bigram_summary_\\"+FileName+"_bigram_\\"
+    if not os.path.exists(SummaryDir):
+        print 'Not exist'
+        os.makedirs(SummaryDir)
+    else:
+        print 'exist'
+    
+    systemDir= SummaryDir+"system\\"
+    if not os.path.exists(systemDir):
+        print 'Not exist'
+        os.makedirs(systemDir)
+    else:
+        print 'exist'
+    referenceDir=SummaryDir+"reference\\"
+    if not os.path.exists(referenceDir):
+        print 'Not exist'
+        os.makedirs(referenceDir)
+    else:
+        print 'exist'
+
+    
+
+    NewsSummaryFile=open(systemDir+FileName+'_SentBigramSummary.txt','w')
+    TweetSummaryFile=open(systemDir+FileName+'_TweetBigramSummary.txt','w')
+    referanceSummaryFile=open(referenceDir+FileName+'_reference1.txt','w')
+
+    str_ref="";
+
+    HighlightSentList=HighLight.split('\n')
+
+    for line in HighlightSentList:
+        
+         str_ref+=str(line)
+         str_ref+="\n"
+    referanceSummaryFile.write(str_ref)
+    referanceSummaryFile.close()
+
+
+
+
+    
     summaryLen=4
     TweetSummary=""
     SentSummary=""
@@ -127,12 +183,7 @@ def create_and_save_bigram_summary(FileName,DestDirectory,SentScore,TweetScore):
     
     
     
-    #----------------------------
-    if not os.path.exists(directory):
-        print 'Not exist'
-        os.makedirs(directory)
-    else:
-        print 'exist'
+    
 
         
     
@@ -163,27 +214,29 @@ def create_bigram(FileName):
     DocTweetScore=ScoreSentByBigram(DocTweetBigramList,DocTweetBigramMaxCount)
     print DocTweetScore[:5]
 
-    
-        
-        
-
-
-
     print 'create bigram end'
+
+    return DocSentScore,DocTweetScore
 
 
     
 
 #----------------------main start---------------------
 
-DestDirectory="F:\\Education\\4_2\\Thsis\\python_sentence_vector_creation\\bigram Directory\\"
-FileName="African runner murder(1)"
-create_bigram(FileName)
 
 
-def deSummart():
+
+def doSummary():
     print ""
+    DestDirectory="F:\\Education\\4_2\\Thsis\\python_sentence_vector_creation\\bigram Directory\\"
+    FileName="African runner murder(1)"
 
+    for i in range(1,15):
+        FileName="Aurora shooting("+str(i)+")"
+        DocSentScore,DocTweetScore=create_bigram(FileName)
+        create_and_save_bigram_summary(FileName,DestDirectory,DocSentScore,DocTweetScore)
+    
+doSummary()
 
 #--------------------main end
     
